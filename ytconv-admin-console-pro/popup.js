@@ -1,265 +1,115 @@
-const els = {
+const UI_STORAGE_KEYS = {
+  THEME: 'uiTheme',
+  ACTIVE_TAB: 'uiActiveTab'
+};
+
+const elements = {
   tabs: [...document.querySelectorAll('.tab')],
   panels: [...document.querySelectorAll('.panel')],
   themeToggle: document.getElementById('themeToggle'),
-  createTicket: document.getElementById('createTicket'),
-  ticketType: document.getElementById('ticketType'),
-  ticketStatus: document.getElementById('ticketStatus'),
-  userName: document.getElementById('userName'),
-  ticketTable: document.getElementById('ticketTable'),
-  ticketCreatedMessage: document.getElementById('ticketCreatedMessage'),
-  exportCsv: document.getElementById('exportCsv'),
-  printPdf: document.getElementById('printPdf'),
-  reportInput: document.getElementById('reportInput'),
-  generateReply: document.getElementById('generateReply'),
-  aiResult: document.getElementById('aiResult'),
-  botToken: document.getElementById('botToken'),
-  chatId: document.getElementById('chatId'),
-  saveTelegram: document.getElementById('saveTelegram'),
-  testTelegram: document.getElementById('testTelegram'),
-  telegramNotice: document.getElementById('telegramNotice')
+  generateAi: document.getElementById('generateAi'),
+  copyAi: document.getElementById('copyAi'),
+  aiPrompt: document.getElementById('aiPrompt'),
+  aiOutput: document.getElementById('aiOutput')
 };
 
-let ticketCache = [];
-
-function formatDate(isoString) {
-  const d = new Date(isoString);
-  return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-function statusBadge(status) {
-  const safe = escapeHtml(status);
-  if (status === 'Open') return `<span class="badge badge-open">${safe}</span>`;
-  if (status === 'Pending') return `<span class="badge badge-pending">${safe}</span>`;
-  if (status === 'Resolved') return `<span class="badge badge-resolved">${safe}</span>`;
-  return `<span class="badge">${safe}</span>`;
-}
-
-function setNotice(el, text, tone = 'ok') {
-  el.textContent = text;
-  el.classList.remove('ok', 'error');
-  if (tone) {
-    el.classList.add(tone);
-  }
-}
-
-function switchTab(tabId) {
-  els.tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.tab === tabId));
-  els.panels.forEach((panel) => panel.classList.toggle('active', panel.id === tabId));
-}
-
-function renderTickets(tickets) {
-  ticketCache = tickets;
-  if (!tickets.length) {
-    els.ticketTable.innerHTML = '<tr><td colspan="5">No tickets yet.</td></tr>';
-    return;
-  }
-
-  els.ticketTable.innerHTML = tickets
-    .map(
-      (ticket) => `
-      <tr>
-        <td>${escapeHtml(ticket.id)}</td>
-        <td>${escapeHtml(ticket.type)}</td>
-        <td>${escapeHtml(formatDate(ticket.date))}</td>
-        <td>${statusBadge(ticket.status)}</td>
-        <td>${escapeHtml(ticket.userName)}</td>
-      </tr>`
-    )
-    .join('');
-}
-
-async function getTickets() {
-  const response = await chrome.runtime.sendMessage({ action: 'GET_TICKETS' });
-  renderTickets(response.tickets || []);
-}
-
-async function createTicket() {
-  const payload = {
-    type: els.ticketType.value,
-    status: els.ticketStatus.value,
-    userName: els.userName.value.trim() || 'Unknown'
-  };
-
-  const response = await chrome.runtime.sendMessage({ action: 'CREATE_TICKET', payload });
-
-  if (!response.success) {
-    setNotice(els.ticketCreatedMessage, 'Unable to create ticket.', 'error');
-    return;
-  }
-
-  const telegramNote = response.telegramResult?.success
-    ? 'Telegram sent.'
-    : response.telegramResult?.reason || 'Telegram skipped.';
-
-  setNotice(els.ticketCreatedMessage, `Created ${response.ticket.id}. ${telegramNote}`, 'ok');
-  els.userName.value = '';
-  await getTickets();
-}
-
-function exportCsv() {
-  const headers = ['Ticket ID', 'Type', 'Date', 'Status', 'User Name'];
-  const rows = ticketCache.map((t) => [t.id, t.type, t.date, t.status, t.userName]);
-  const csv = [headers, ...rows]
-    .map((row) => row.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(','))
-    .join('\n');
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `ytconv_tickets_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function generateDailyPdfReport() {
-  const today = new Date().toLocaleDateString();
-  const openCount = ticketCache.filter((t) => t.status === 'Open').length;
-  const pendingCount = ticketCache.filter((t) => t.status === 'Pending').length;
-  const resolvedCount = ticketCache.filter((t) => t.status === 'Resolved').length;
-
-  const reportWindow = window.open('', '_blank', 'width=860,height=700');
-  reportWindow.document.write(`
-    <html>
-    <head>
-      <title>YTConv Daily Report</title>
-      <style>
-        body { font-family: Arial, sans-serif; margin: 30px; color:#0f172a; }
-        .card { border:1px solid #dbeafe; border-radius:16px; padding:18px; margin-bottom:16px; }
-        h1 { margin:0 0 6px; }
-        table { width:100%; border-collapse:collapse; margin-top:12px; }
-        th,td { border:1px solid #e2e8f0; padding:8px; text-align:left; font-size:12px; }
-        .stats { display:flex; gap:12px; }
-      </style>
-    </head>
-    <body>
-      <h1>YTConv Admin Console PRO - Daily Summary</h1>
-      <p>Date: ${today}</p>
-      <div class="stats">
-        <div class="card">Total: <strong>${ticketCache.length}</strong></div>
-        <div class="card">Open: <strong>${openCount}</strong></div>
-        <div class="card">Pending: <strong>${pendingCount}</strong></div>
-        <div class="card">Resolved: <strong>${resolvedCount}</strong></div>
-      </div>
-      <div class="card">
-        <h3>Ticket List</h3>
-        <table>
-          <thead><tr><th>ID</th><th>Type</th><th>Date</th><th>Status</th><th>User</th></tr></thead>
-          <tbody>
-            ${ticketCache
-              .map(
-                (t) =>
-                  `<tr><td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.type)}</td><td>${escapeHtml(
-                    formatDate(t.date)
-                  )}</td><td>${escapeHtml(t.status)}</td><td>${escapeHtml(t.userName)}</td></tr>`
-              )
-              .join('')}
-          </tbody>
-        </table>
-      </div>
-      <script>window.print()</script>
-    </body>
-    </html>
-  `);
-  reportWindow.document.close();
-}
-
-async function generateAiReply() {
-  const reportText = els.reportInput.value.trim();
-  if (!reportText) {
-    els.aiResult.value = 'Please enter a report first.';
-    return;
-  }
-
-  els.aiResult.value = 'Generating...';
-
-  try {
-    // Replace with your own secured backend endpoint that injects API keys server-side.
-    const AI_ENDPOINT = 'https://your-ai-endpoint.example.com/reply';
-    const response = await fetch(AI_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ report: reportText })
-    });
-
-    if (!response.ok) {
-      throw new Error(`AI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    els.aiResult.value = data.reply || 'No reply returned from AI service.';
-  } catch (error) {
-    // Graceful fallback keeps UI usable without blocking operators.
-    els.aiResult.value =
-      `Unable to reach AI endpoint (${error.message}).\n\n` +
-      'Template reply:\n' +
-      'Thank you for your report. Our team has reviewed the issue and created a ticket. ' +
-      'We will update you shortly with the next steps.';
-  }
-}
-
-async function loadTelegramConfig() {
-  const response = await chrome.runtime.sendMessage({ action: 'GET_TELEGRAM_CONFIG' });
-  els.botToken.value = response.telegramConfig?.botToken || '';
-  els.chatId.value = response.telegramConfig?.chatId || '';
-}
-
-async function saveTelegramConfig() {
-  await chrome.runtime.sendMessage({
-    action: 'SAVE_TELEGRAM_CONFIG',
-    payload: {
-      botToken: els.botToken.value.trim(),
-      chatId: els.chatId.value.trim()
-    }
+function setActiveTab(tabName) {
+  elements.tabs.forEach((tab) => {
+    const isActive = tab.dataset.tab === tabName;
+    tab.classList.toggle('is-active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
   });
-  setNotice(els.telegramNotice, 'Telegram configuration saved.', 'ok');
+
+  elements.panels.forEach((panel) => {
+    const isActive = panel.id === tabName;
+    panel.classList.toggle('is-active', isActive);
+    panel.hidden = !isActive;
+  });
+
+  chrome.storage.local.set({ [UI_STORAGE_KEYS.ACTIVE_TAB]: tabName });
 }
 
-async function sendTelegramTest() {
-  const response = await chrome.runtime.sendMessage({ action: 'SEND_TELEGRAM_TEST' });
-  if (response.result?.success) {
-    setNotice(els.telegramNotice, 'Test message sent successfully.', 'ok');
-  } else {
-    setNotice(els.telegramNotice, `Failed: ${response.result?.reason || 'Unknown error'}`, 'error');
-  }
-}
-
-async function loadTheme() {
-  const { uiTheme = 'dark' } = await chrome.storage.local.get('uiTheme');
-  document.documentElement.dataset.theme = uiTheme === 'neon' ? 'neon' : '';
-  els.themeToggle.textContent = uiTheme === 'neon' ? 'Admin Dark' : 'Neon Mode';
+function applyTheme(theme) {
+  const isNeon = theme === 'neon';
+  document.documentElement.dataset.theme = isNeon ? 'neon' : '';
+  elements.themeToggle.textContent = isNeon ? 'Dark' : 'Neon';
 }
 
 async function toggleTheme() {
-  const isNeon = document.documentElement.dataset.theme === 'neon';
-  const next = isNeon ? 'dark' : 'neon';
-  document.documentElement.dataset.theme = next === 'neon' ? 'neon' : '';
-  els.themeToggle.textContent = next === 'neon' ? 'Admin Dark' : 'Neon Mode';
-  await chrome.storage.local.set({ uiTheme: next });
+  const currentTheme = document.documentElement.dataset.theme === 'neon' ? 'neon' : 'dark';
+  const nextTheme = currentTheme === 'neon' ? 'dark' : 'neon';
+  applyTheme(nextTheme);
+  await chrome.storage.local.set({ [UI_STORAGE_KEYS.THEME]: nextTheme });
 }
 
-function bindEvents() {
-  els.tabs.forEach((tab) => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
-  els.createTicket.addEventListener('click', createTicket);
-  els.exportCsv.addEventListener('click', exportCsv);
-  els.printPdf.addEventListener('click', generateDailyPdfReport);
-  els.generateReply.addEventListener('click', generateAiReply);
-  els.saveTelegram.addEventListener('click', saveTelegramConfig);
-  els.testTelegram.addEventListener('click', sendTelegramTest);
-  els.themeToggle.addEventListener('click', toggleTheme);
+function bindTabEvents() {
+  elements.tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      setActiveTab(tab.dataset.tab);
+    });
+  });
 }
 
-(async function init() {
-  bindEvents();
-  await Promise.all([getTickets(), loadTelegramConfig(), loadTheme()]);
+function buildMockAiReply(text) {
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  return [
+    'Hello,',
+    '',
+    `Thank you for your report regarding: "${cleaned.slice(0, 130)}${cleaned.length > 130 ? '…' : ''}".`,
+    'Our admin team has reviewed the issue and opened a support ticket for tracking.',
+    'We will provide an update after verification and next-step confirmation.',
+    '',
+    'Best regards,',
+    'YTConv Support Team'
+  ].join('\n');
+}
+
+function handleGenerateAi() {
+  const source = elements.aiPrompt.value.trim();
+  if (!source) {
+    elements.aiOutput.value = 'Please enter a user report first.';
+    return;
+  }
+
+  elements.aiOutput.value = buildMockAiReply(source);
+}
+
+async function handleCopyAi() {
+  const value = elements.aiOutput.value.trim();
+  if (!value) {
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(value);
+    elements.copyAi.textContent = 'Copied';
+    window.setTimeout(() => {
+      elements.copyAi.textContent = 'Copy';
+    }, 1000);
+  } catch {
+    elements.copyAi.textContent = 'Failed';
+    window.setTimeout(() => {
+      elements.copyAi.textContent = 'Copy';
+    }, 1000);
+  }
+}
+
+function bindUiEvents() {
+  bindTabEvents();
+  elements.themeToggle.addEventListener('click', toggleTheme);
+  elements.generateAi.addEventListener('click', handleGenerateAi);
+  elements.copyAi.addEventListener('click', handleCopyAi);
+}
+
+async function bootstrapUiState() {
+  const { [UI_STORAGE_KEYS.THEME]: savedTheme = 'dark', [UI_STORAGE_KEYS.ACTIVE_TAB]: savedTab = 'tickets' } =
+    await chrome.storage.local.get([UI_STORAGE_KEYS.THEME, UI_STORAGE_KEYS.ACTIVE_TAB]);
+
+  applyTheme(savedTheme);
+  setActiveTab(savedTab);
+}
+
+(async function initPopupUi() {
+  bindUiEvents();
+  await bootstrapUiState();
 })();
