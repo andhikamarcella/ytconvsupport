@@ -27,6 +27,31 @@ function formatDate(isoString) {
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function statusBadge(status) {
+  const safe = escapeHtml(status);
+  if (status === 'Open') return `<span class="badge badge-open">${safe}</span>`;
+  if (status === 'Pending') return `<span class="badge badge-pending">${safe}</span>`;
+  if (status === 'Resolved') return `<span class="badge badge-resolved">${safe}</span>`;
+  return `<span class="badge">${safe}</span>`;
+}
+
+function setNotice(el, text, tone = 'ok') {
+  el.textContent = text;
+  el.classList.remove('ok', 'error');
+  if (tone) {
+    el.classList.add(tone);
+  }
+}
+
 function switchTab(tabId) {
   els.tabs.forEach((tab) => tab.classList.toggle('active', tab.dataset.tab === tabId));
   els.panels.forEach((panel) => panel.classList.toggle('active', panel.id === tabId));
@@ -43,11 +68,11 @@ function renderTickets(tickets) {
     .map(
       (ticket) => `
       <tr>
-        <td>${ticket.id}</td>
-        <td>${ticket.type}</td>
-        <td>${formatDate(ticket.date)}</td>
-        <td>${ticket.status}</td>
-        <td>${ticket.userName}</td>
+        <td>${escapeHtml(ticket.id)}</td>
+        <td>${escapeHtml(ticket.type)}</td>
+        <td>${escapeHtml(formatDate(ticket.date))}</td>
+        <td>${statusBadge(ticket.status)}</td>
+        <td>${escapeHtml(ticket.userName)}</td>
       </tr>`
     )
     .join('');
@@ -67,14 +92,18 @@ async function createTicket() {
 
   const response = await chrome.runtime.sendMessage({ action: 'CREATE_TICKET', payload });
 
-  if (response.success) {
-    const telegramNote = response.telegramResult?.success
-      ? 'Telegram sent.'
-      : response.telegramResult?.reason || 'Telegram skipped.';
-    els.ticketCreatedMessage.textContent = `Created ${response.ticket.id}. ${telegramNote}`;
-    els.userName.value = '';
-    await getTickets();
+  if (!response.success) {
+    setNotice(els.ticketCreatedMessage, 'Unable to create ticket.', 'error');
+    return;
   }
+
+  const telegramNote = response.telegramResult?.success
+    ? 'Telegram sent.'
+    : response.telegramResult?.reason || 'Telegram skipped.';
+
+  setNotice(els.ticketCreatedMessage, `Created ${response.ticket.id}. ${telegramNote}`, 'ok');
+  els.userName.value = '';
+  await getTickets();
 }
 
 function exportCsv() {
@@ -130,9 +159,9 @@ function generateDailyPdfReport() {
             ${ticketCache
               .map(
                 (t) =>
-                  `<tr><td>${t.id}</td><td>${t.type}</td><td>${formatDate(t.date)}</td><td>${
-                    t.status
-                  }</td><td>${t.userName}</td></tr>`
+                  `<tr><td>${escapeHtml(t.id)}</td><td>${escapeHtml(t.type)}</td><td>${escapeHtml(
+                    formatDate(t.date)
+                  )}</td><td>${escapeHtml(t.status)}</td><td>${escapeHtml(t.userName)}</td></tr>`
               )
               .join('')}
           </tbody>
@@ -193,14 +222,16 @@ async function saveTelegramConfig() {
       chatId: els.chatId.value.trim()
     }
   });
-  els.telegramNotice.textContent = 'Telegram configuration saved.';
+  setNotice(els.telegramNotice, 'Telegram configuration saved.', 'ok');
 }
 
 async function sendTelegramTest() {
   const response = await chrome.runtime.sendMessage({ action: 'SEND_TELEGRAM_TEST' });
-  els.telegramNotice.textContent = response.result?.success
-    ? 'Test message sent successfully.'
-    : `Failed: ${response.result?.reason || 'Unknown error'}`;
+  if (response.result?.success) {
+    setNotice(els.telegramNotice, 'Test message sent successfully.', 'ok');
+  } else {
+    setNotice(els.telegramNotice, `Failed: ${response.result?.reason || 'Unknown error'}`, 'error');
+  }
 }
 
 async function loadTheme() {
