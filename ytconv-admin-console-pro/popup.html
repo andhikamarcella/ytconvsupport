@@ -7,19 +7,16 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <main class="popup" aria-label="YTConv Admin Console PRO">
-      <header class="header glass">
-        <div class="brand">
-          <div class="logo" aria-hidden="true">YT</div>
-          <div>
-            <h1>YTConv Admin Console PRO</h1>
-            <p class="meta">Support operations dashboard</p>
-          </div>
+    <main class="app-container">
+      <header class="header card-surface">
+        <div>
+          <h1>YTConv Admin Console PRO</h1>
+          <p class="subtle">Support mini dashboard</p>
         </div>
         <button id="themeToggle" class="btn btn-secondary" type="button">Neon</button>
       </header>
 
-      <nav class="tabs glass" role="tablist" aria-label="Main sections">
+      <nav class="tabs card-surface" role="tablist" aria-label="Admin sections">
         <button class="tab is-active" data-tab="tickets" role="tab" aria-selected="true">Tickets</button>
         <button class="tab" data-tab="templates" role="tab" aria-selected="false">Templates</button>
         <button class="tab" data-tab="ai" role="tab" aria-selected="false">AI</button>
@@ -27,21 +24,22 @@
         <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
       </nav>
 
-      <section class="content" id="contentArea">
+      <section class="content-area">
         <article id="tickets" class="panel is-active" role="tabpanel">
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
               <h2>Ticket Generator</h2>
-              <small>New case intake</small>
+              <small>Daily support intake</small>
             </div>
+
             <div class="grid two-col">
               <label>
                 User name
-                <input type="text" id="ticketUser" placeholder="john.doe" />
+                <input type="text" placeholder="john.doe" />
               </label>
               <label>
-                Ticket type
-                <select id="ticketType">
+                Type
+                <select>
                   <option>Bug</option>
                   <option>Report</option>
                   <option>Billing</option>
@@ -50,7 +48,7 @@
               </label>
               <label>
                 Priority
-                <select id="ticketPriority">
+                <select>
                   <option>Normal</option>
                   <option>High</option>
                   <option>Urgent</option>
@@ -58,20 +56,21 @@
               </label>
               <label>
                 Status
-                <select id="ticketStatus">
+                <select>
                   <option>Open</option>
                   <option>Pending</option>
                   <option>Resolved</option>
                 </select>
               </label>
             </div>
-            <button class="btn btn-primary btn-block" id="createTicket" type="button">Create Ticket</button>
+
+            <button class="btn btn-primary btn-block" type="button">Create Ticket</button>
           </section>
 
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
               <h2>Recent Tickets</h2>
-              <small>Live overview</small>
+              <small>Latest updates</small>
             </div>
             <div class="table-wrap">
               <table>
@@ -83,12 +82,18 @@
                     <th>User</th>
                   </tr>
                 </thead>
-                <tbody id="ticketRows">
+                <tbody>
                   <tr>
                     <td>YT-20260223-001</td>
                     <td>Bug</td>
                     <td><span class="pill">Open</span></td>
                     <td>john.doe</td>
+                  </tr>
+                  <tr>
+                    <td>YT-20260223-002</td>
+                    <td>Billing</td>
+                    <td><span class="pill pending">Pending</span></td>
+                    <td>amy.lee</td>
                   </tr>
                 </tbody>
               </table>
@@ -97,31 +102,31 @@
         </article>
 
         <article id="templates" class="panel" role="tabpanel" hidden>
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
-              <h2>Response Templates</h2>
-              <small>Reusable messaging</small>
+              <h2>Templates</h2>
+              <small>Reusable responses</small>
             </div>
             <label>
               Template title
-              <input id="templateTitle" type="text" placeholder="Delay acknowledgement" />
+              <input type="text" placeholder="Delay acknowledgement" />
             </label>
             <label>
               Template body
-              <textarea id="templateBody" rows="5" placeholder="Thanks for reaching out..." ></textarea>
+              <textarea rows="5" placeholder="Thanks for your report..."></textarea>
             </label>
             <div class="row">
               <button class="btn btn-primary" type="button">Save Template</button>
-              <button class="btn btn-secondary" type="button">Clear</button>
+              <button class="btn btn-secondary" type="button">Reset</button>
             </div>
           </section>
         </article>
 
         <article id="ai" class="panel" role="tabpanel" hidden>
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
-              <h2>AI Reply Composer</h2>
-              <small>Operator assistant</small>
+              <h2>AI Reply Assistant</h2>
+              <small>Draft quality responses</small>
             </div>
             <label>
               User report
@@ -132,58 +137,56 @@
               <button class="btn btn-secondary" id="copyAi" type="button">Copy</button>
             </div>
             <label>
-              Suggested reply
-              <textarea id="aiOutput" rows="6" placeholder="AI response appears here"></textarea>
+              Result
+              <textarea id="aiOutput" rows="6" placeholder="AI response appears here..."></textarea>
             </label>
           </section>
         </article>
 
         <article id="telegram" class="panel" role="tabpanel" hidden>
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
               <h2>Telegram Integration</h2>
-              <small>Delivery channel setup</small>
+              <small>Notification channel</small>
             </div>
             <label>
               Bot token
-              <input id="botToken" type="password" placeholder="123456:ABC..." />
+              <input type="password" placeholder="123456:ABC..." />
             </label>
             <label>
               Chat ID
-              <input id="chatId" type="text" placeholder="-1001234567890" />
+              <input type="text" placeholder="-1001234567890" />
             </label>
             <div class="row">
-              <button class="btn btn-primary" id="saveTelegram" type="button">Save</button>
-              <button class="btn btn-secondary" id="testTelegram" type="button">Send Test</button>
+              <button class="btn btn-primary" type="button">Save</button>
+              <button class="btn btn-secondary" type="button">Send Test</button>
             </div>
           </section>
         </article>
 
         <article id="settings" class="panel" role="tabpanel" hidden>
-          <section class="card glass">
+          <section class="card card-surface">
             <div class="card-head">
-              <h2>Workspace Settings</h2>
-              <small>Extension preferences</small>
+              <h2>Settings</h2>
+              <small>Workspace preferences</small>
             </div>
             <label class="switch-line">
-              <span>Enable compact table mode</span>
-              <input id="compactMode" type="checkbox" />
+              <span>Enable compact mode</span>
+              <input type="checkbox" />
             </label>
             <label class="switch-line">
-              <span>Auto-copy ticket ID after create</span>
-              <input id="autoCopy" type="checkbox" />
+              <span>Auto copy ticket ID</span>
+              <input type="checkbox" />
             </label>
-            <label>
-              Admin notes
-              <textarea rows="4" placeholder="Internal notes for operators..."></textarea>
-            </label>
-            <button class="btn btn-primary" type="button">Save Preferences</button>
+            <button class="btn btn-secondary btn-block" id="openDashboard" type="button">
+              Open Full Dashboard
+            </button>
           </section>
         </article>
       </section>
 
-      <footer class="footer glass">
-        <small>v1.0.0 PRO · YTConv Admin Suite</small>
+      <footer class="footer card-surface">
+        <small>v1.1.0 PRO · YTConv Admin Suite</small>
       </footer>
     </main>
 

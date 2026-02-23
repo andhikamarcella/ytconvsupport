@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YTConv Admin Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <h1>YTConv PRO</h1>
+        <p>Admin workspace</p>
+        <nav>
+          <button class="nav-item is-active">Overview</button>
+          <button class="nav-item">Tickets</button>
+          <button class="nav-item">AI Responses</button>
+          <button class="nav-item">Telegram</button>
+          <button class="nav-item">Settings</button>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <h2>Overview Dashboard</h2>
+          <button id="dashTheme" class="btn">Toggle Theme</button>
+        </header>
+
+        <section class="stats">
+          <article class="card"><h3>Open Tickets</h3><strong>23</strong></article>
+          <article class="card"><h3>Pending</h3><strong>11</strong></article>
+          <article class="card"><h3>Resolved Today</h3><strong>18</strong></article>
+          <article class="card"><h3>AI Drafts</h3><strong>42</strong></article>
+        </section>
+
+        <section class="card wide">
+          <h3>Activity Feed</h3>
+          <ul>
+            <li>YT-20260223-001 assigned to Billing Team.</li>
+            <li>Telegram alert sent for YT-20260223-002.</li>
+            <li>AI draft generated for customer escalation ticket.</li>
+          </ul>
+        </section>
+      </main>
+    </div>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
