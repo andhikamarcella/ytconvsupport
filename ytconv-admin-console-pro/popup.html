@@ -3,191 +3,124 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YTConv Admin Console PRO</title>
+    <title>YTConv Support Ticket Processor</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
     <main class="app-container">
-      <header class="header card-surface">
+      <header class="header card">
         <div>
-          <h1>YTConv Admin Console PRO</h1>
-          <p class="subtle">Support mini dashboard</p>
+          <h1>YTConv Support Ticket Processor</h1>
+          <p class="subtitle">Convert complaint emails into structured tickets</p>
         </div>
         <button id="themeToggle" class="btn btn-secondary" type="button">Neon</button>
       </header>
 
-      <nav class="tabs card-surface" role="tablist" aria-label="Admin sections">
-        <button class="tab is-active" data-tab="tickets" role="tab" aria-selected="true">Tickets</button>
-        <button class="tab" data-tab="templates" role="tab" aria-selected="false">Templates</button>
-        <button class="tab" data-tab="ai" role="tab" aria-selected="false">AI</button>
-        <button class="tab" data-tab="telegram" role="tab" aria-selected="false">Telegram</button>
-        <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
-      </nav>
+      <section class="card">
+        <div class="section-head">
+          <h2>Input Email Complaint</h2>
+          <small>Paste full user email content</small>
+        </div>
 
-      <section class="content-area">
-        <article id="tickets" class="panel is-active" role="tabpanel">
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>Ticket Generator</h2>
-              <small>Daily support intake</small>
-            </div>
+        <label>
+          Ticket Type
+          <select id="ticketType">
+            <option>General</option>
+            <option>Bug</option>
+            <option>Billing</option>
+            <option>Abuse Report</option>
+            <option>Account Issue</option>
+          </select>
+        </label>
 
-            <div class="grid two-col">
-              <label>
-                User name
-                <input type="text" placeholder="john.doe" />
-              </label>
-              <label>
-                Type
-                <select>
-                  <option>Bug</option>
-                  <option>Report</option>
-                  <option>Billing</option>
-                  <option>General</option>
-                </select>
-              </label>
-              <label>
-                Priority
-                <select>
-                  <option>Normal</option>
-                  <option>High</option>
-                  <option>Urgent</option>
-                </select>
-              </label>
-              <label>
-                Status
-                <select>
-                  <option>Open</option>
-                  <option>Pending</option>
-                  <option>Resolved</option>
-                </select>
-              </label>
-            </div>
+        <label>
+          Email Content
+          <textarea
+            id="rawEmail"
+            rows="8"
+            placeholder="From: Jane Doe <jane@example.com>&#10;Subject: Login issue&#10;&#10;Hello support, I cannot login since yesterday..."
+          ></textarea>
+        </label>
 
-            <button class="btn btn-primary btn-block" type="button">Create Ticket</button>
-          </section>
-
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>Recent Tickets</h2>
-              <small>Latest updates</small>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>User</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>YT-20260223-001</td>
-                    <td>Bug</td>
-                    <td><span class="pill">Open</span></td>
-                    <td>john.doe</td>
-                  </tr>
-                  <tr>
-                    <td>YT-20260223-002</td>
-                    <td>Billing</td>
-                    <td><span class="pill pending">Pending</span></td>
-                    <td>amy.lee</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </article>
-
-        <article id="templates" class="panel" role="tabpanel" hidden>
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>Templates</h2>
-              <small>Reusable responses</small>
-            </div>
-            <label>
-              Template title
-              <input type="text" placeholder="Delay acknowledgement" />
-            </label>
-            <label>
-              Template body
-              <textarea rows="5" placeholder="Thanks for your report..."></textarea>
-            </label>
-            <div class="row">
-              <button class="btn btn-primary" type="button">Save Template</button>
-              <button class="btn btn-secondary" type="button">Reset</button>
-            </div>
-          </section>
-        </article>
-
-        <article id="ai" class="panel" role="tabpanel" hidden>
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>AI Reply Assistant</h2>
-              <small>Draft quality responses</small>
-            </div>
-            <label>
-              User report
-              <textarea id="aiPrompt" rows="5" placeholder="Paste customer report text..."></textarea>
-            </label>
-            <div class="row">
-              <button class="btn btn-primary" id="generateAi" type="button">Generate Reply</button>
-              <button class="btn btn-secondary" id="copyAi" type="button">Copy</button>
-            </div>
-            <label>
-              Result
-              <textarea id="aiOutput" rows="6" placeholder="AI response appears here..."></textarea>
-            </label>
-          </section>
-        </article>
-
-        <article id="telegram" class="panel" role="tabpanel" hidden>
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>Telegram Integration</h2>
-              <small>Notification channel</small>
-            </div>
-            <label>
-              Bot token
-              <input type="password" placeholder="123456:ABC..." />
-            </label>
-            <label>
-              Chat ID
-              <input type="text" placeholder="-1001234567890" />
-            </label>
-            <div class="row">
-              <button class="btn btn-primary" type="button">Save</button>
-              <button class="btn btn-secondary" type="button">Send Test</button>
-            </div>
-          </section>
-        </article>
-
-        <article id="settings" class="panel" role="tabpanel" hidden>
-          <section class="card card-surface">
-            <div class="card-head">
-              <h2>Settings</h2>
-              <small>Workspace preferences</small>
-            </div>
-            <label class="switch-line">
-              <span>Enable compact mode</span>
-              <input type="checkbox" />
-            </label>
-            <label class="switch-line">
-              <span>Auto copy ticket ID</span>
-              <input type="checkbox" />
-            </label>
-            <button class="btn btn-secondary btn-block" id="openDashboard" type="button">
-              Open Full Dashboard
-            </button>
-          </section>
-        </article>
+        <div class="row">
+          <button id="processTicket" class="btn btn-primary btn-block" type="button">Process Ticket</button>
+        </div>
+        <p id="statusText" class="status-text"></p>
       </section>
 
-      <footer class="footer card-surface">
-        <small>v1.1.0 PRO · YTConv Admin Suite</small>
-      </footer>
+      <section class="content-area">
+        <article class="card">
+          <div class="section-head">
+            <h2>Ticket Summary</h2>
+            <small>Auto-parsed details</small>
+          </div>
+          <div id="ticketSummary" class="summary-grid empty-state">No ticket processed yet.</div>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Reply Preview</h2>
+            <small>Professional response template</small>
+          </div>
+          <textarea id="replyPreview" rows="10" placeholder="Generated reply will appear here..."></textarea>
+          <div class="row">
+            <button id="copyReply" class="btn btn-secondary" type="button">Copy Reply</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Telegram Notification</h2>
+            <small>Optional alert on new ticket</small>
+          </div>
+
+          <label class="inline">
+            <input id="telegramEnabled" type="checkbox" />
+            <span>Enable Telegram notifications</span>
+          </label>
+
+          <label>
+            Bot Token
+            <input id="telegramBotToken" type="password" placeholder="123456:ABC..." />
+          </label>
+
+          <label>
+            Chat ID
+            <input id="telegramChatId" type="text" placeholder="-1001234567890" />
+          </label>
+
+          <button id="saveTelegram" class="btn btn-secondary" type="button">Save Telegram Settings</button>
+        </article>
+
+        <article class="card">
+          <div class="section-head">
+            <h2>Ticket History</h2>
+            <small>Stored in chrome.storage</small>
+          </div>
+
+          <div class="row">
+            <button id="exportCsv" class="btn btn-secondary" type="button">Export CSV</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody id="ticketHistoryBody">
+                <tr>
+                  <td colspan="4" class="empty-state">No tickets yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
     </main>
 
     <script src="popup.js"></script>
