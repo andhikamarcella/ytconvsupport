@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "YTConv Support Ticket Processor",
-  "description": "Convert user complaint emails into structured tickets and auto-generate professional replies.",
-  "version": "1.0.0",
+  "name": "YTConv Support System Ultimate",
+  "description": "Mini helpdesk system for parsing complaint emails, managing tickets, SLA tracking, replies, and analytics.",
+  "version": "2.0.0",
   "permissions": ["storage", "clipboardWrite"],
   "host_permissions": ["https://api.telegram.org/*"],
   "action": {
-    "default_title": "YTConv Support Ticket Processor",
+    "default_title": "YTConv Support System Ultimate",
     "default_popup": "popup.html"
   },
   "background": {
