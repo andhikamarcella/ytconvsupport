@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YTConv Admin Console PRO</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header glass">
+        <div>
+          <h1>YTConv Admin Console <span>PRO</span></h1>
+          <p>Advanced support operations dashboard</p>
+        </div>
+        <button id="themeToggle" class="btn btn-chip">Neon Mode</button>
+      </header>
+
+      <nav class="tabs glass" role="tablist">
+        <button class="tab active" data-tab="tickets">Tickets</button>
+        <button class="tab" data-tab="ai">AI Reply</button>
+        <button class="tab" data-tab="exports">Exports</button>
+        <button class="tab" data-tab="telegram">Telegram</button>
+      </nav>
+
+      <section id="tickets" class="panel active glass">
+        <h2>Ticket Generator</h2>
+        <div class="grid two">
+          <label>
+            User Name
+            <input id="userName" type="text" placeholder="Enter user name" />
+          </label>
+          <label>
+            Type
+            <select id="ticketType">
+              <option>Bug</option>
+              <option>Report</option>
+              <option>Billing</option>
+              <option>General</option>
+            </select>
+          </label>
+          <label>
+            Status
+            <select id="ticketStatus">
+              <option>Open</option>
+              <option>Pending</option>
+              <option>Resolved</option>
+            </select>
+          </label>
+        </div>
+        <button id="createTicket" class="btn btn-primary">Create Ticket</button>
+        <p id="ticketCreatedMessage" class="notice"></p>
+
+        <h3>Ticket Storage</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody id="ticketTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="ai" class="panel glass">
+        <h2>AI Reply Suggestion</h2>
+        <label>
+          User Report
+          <textarea id="reportInput" rows="5" placeholder="Paste user report..."></textarea>
+        </label>
+        <button id="generateReply" class="btn btn-primary">Generate Reply</button>
+        <label>
+          AI Suggested Reply
+          <textarea id="aiResult" rows="6" placeholder="AI response will appear here..."></textarea>
+        </label>
+      </section>
+
+      <section id="exports" class="panel glass">
+        <h2>Exports & Reports</h2>
+        <div class="actions">
+          <button id="exportCsv" class="btn btn-primary">Export Tickets CSV</button>
+          <button id="printPdf" class="btn btn-secondary">Generate Daily PDF Report</button>
+        </div>
+      </section>
+
+      <section id="telegram" class="panel glass">
+        <h2>Telegram Integration</h2>
+        <label>
+          Bot Token
+          <input id="botToken" type="password" placeholder="123456:ABC..." />
+        </label>
+        <label>
+          Chat ID
+          <input id="chatId" type="text" placeholder="-1001234567890" />
+        </label>
+        <div class="actions">
+          <button id="saveTelegram" class="btn btn-primary">Save Configuration</button>
+          <button id="testTelegram" class="btn btn-secondary">Send Test Notification</button>
+        </div>
+        <p id="telegramNotice" class="notice"></p>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
