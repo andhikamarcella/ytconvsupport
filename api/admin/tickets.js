@@ -1,4 +1,4 @@
-import { query } from '../../lib/db.js';
+import { listTickets, readTicket, writeTicket } from '../../lib/cloudinary-store.js';
 import { sendStatusUpdateEmail } from '../../lib/emailjs.js';
 import { json, readJson, handleError, HttpError } from '../../lib/http.js';
 import { requireAdmin, isValidTicketId, normalizeTicketId } from '../../lib/security.js';
@@ -12,36 +12,27 @@ export default async function handler(req, res) {
       const limit = Math.min(100, Math.max(1, Number(req.query?.limit || 50)));
       const offset = Math.max(0, Number(req.query?.offset || 0));
       const status = String(req.query?.status || '').trim();
-      const search = String(req.query?.q || '').trim();
+      const search = String(req.query?.q || '').trim().toLowerCase().slice(0, 120);
 
-      const conditions = [];
-      const params = [];
+      let tickets = await listTickets();
       if (status && Object.hasOwn(STATUSES, status)) {
-        params.push(status);
-        conditions.push(`status = $${params.length}`);
+        tickets = tickets.filter((ticket) => ticket.status === status);
       }
       if (search) {
-        params.push(`%${search.slice(0, 120)}%`);
-        const i = params.length;
-        conditions.push(`(ticket_id ILIKE $${i} OR name ILIKE $${i} OR email ILIKE $${i} OR description ILIKE $${i})`);
+        tickets = tickets.filter((ticket) => [
+          ticket.ticketId,
+          ticket.name,
+          ticket.email,
+          ticket.description,
+          ticket.category
+        ].some((value) => String(value || '').toLowerCase().includes(search)));
       }
 
-      const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-      params.push(limit, offset);
-      const result = await query(
-        `SELECT * FROM support_tickets
-         ${where}
-         ORDER BY created_at DESC
-         LIMIT $${params.length - 1} OFFSET $${params.length}`,
-        params
-      );
-      const countParams = params.slice(0, -2);
-      const countResult = await query(`SELECT COUNT(*)::int AS count FROM support_tickets ${where}`, countParams);
-
+      const total = tickets.length;
       return json(res, 200, {
         ok: true,
-        tickets: result.rows.map(adminTicket),
-        total: countResult.rows[0].count,
+        tickets: tickets.slice(offset, offset + limit).map(adminTicket),
+        total,
         limit,
         offset
       });
@@ -57,16 +48,13 @@ export default async function handler(req, res) {
       if (!Object.hasOwn(STATUSES, status)) throw new HttpError(400, 'Status tiket tidak valid.', 'INVALID_STATUS');
       if (publicNote.length > 1000) throw new HttpError(400, 'Catatan publik maksimal 1000 karakter.', 'NOTE_TOO_LONG');
 
-      const result = await query(
-        `UPDATE support_tickets
-         SET status = $2, public_note = $3, updated_at = NOW()
-         WHERE ticket_id = $1
-         RETURNING *`,
-        [ticketId, status, publicNote]
-      );
-      if (!result.rowCount) throw new HttpError(404, 'Tiket tidak ditemukan.', 'TICKET_NOT_FOUND');
+      const ticketData = await readTicket(ticketId);
+      ticketData.status = status;
+      ticketData.publicNote = publicNote;
+      ticketData.updatedAt = new Date().toISOString();
+      await writeTicket(ticketData);
 
-      const ticket = adminTicket(result.rows[0]);
+      const ticket = adminTicket(ticketData);
       let notificationSent = false;
       try {
         const notification = await sendStatusUpdateEmail(ticket);

@@ -1,4 +1,4 @@
-import { query } from '../lib/db.js';
+import { readTicket } from '../lib/cloudinary-store.js';
 import { json, handleError, HttpError } from '../lib/http.js';
 import { isValidTicketId, normalizeTicketId } from '../lib/security.js';
 import { publicTicket } from '../lib/tickets.js';
@@ -11,18 +11,8 @@ export default async function handler(req, res) {
       throw new HttpError(400, 'Format ID tiket tidak valid.', 'INVALID_TICKET_ID');
     }
 
-    const result = await query(
-      `SELECT ticket_id, category, status, public_note, created_at, updated_at
-       FROM support_tickets
-       WHERE ticket_id = $1
-       LIMIT 1`,
-      [ticketId]
-    );
-    if (result.rowCount === 0) {
-      throw new HttpError(404, 'Tiket tidak ditemukan. Periksa kembali ID tiket.', 'TICKET_NOT_FOUND');
-    }
-
-    return json(res, 200, { ok: true, ticket: publicTicket(result.rows[0]) });
+    const ticket = await readTicket(ticketId);
+    return json(res, 200, { ok: true, ticket: publicTicket(ticket) });
   } catch (error) {
     return handleError(res, error);
   }
