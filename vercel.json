@@ -36,5 +36,6 @@
         }
       ]
     }
-  ]
+  ],
+  "installCommand": "npm ci --registry=https://registry.npmjs.org/"
 }

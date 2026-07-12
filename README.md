@@ -238,3 +238,7 @@ Lalu uji:
 ## Catatan integrasi dengan YTConv utama
 
 Proyek ini berjalan mandiri sehingga tidak bergantung pada CORS milik `ytconv.onrender.com`. Tombol “Kembali ke YTConv” tetap mengarah ke aplikasi utama. Jika kelak ingin memakai domain yang sama, file halaman dan API dapat dipindahkan ke repository YTConv lalu route-nya dipertahankan.
+
+## Perbaikan deployment Vercel
+
+Proyek memaksa npm menggunakan registry publik melalui `.npmrc` dan `installCommand`. Node.js dipatok ke `20.x` agar tidak otomatis berpindah ke major baru.
