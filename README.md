@@ -18,7 +18,7 @@ PUBLIC_BASE_URL=https://domain-support.vercel.app
 MAIN_APP_URL=https://ytconv.onrender.com
 SUPPORT_EMAIL=help.ytconv@proton.me
 
-TICKET_CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
 CLOUDINARY_TICKET_FOLDER=ytconv/tickets
 TICKET_ENCRYPTION_KEY=SECRET_ACAK_MINIMAL_32_KARAKTER
 
@@ -28,7 +28,7 @@ ADMIN_JWT_SECRET=SECRET_ACAK_MINIMAL_64_KARAKTER
 SESSION_SECRET=SECRET_ACAK_MINIMAL_64_KARAKTER
 ```
 
-Gunakan `TICKET_CLOUDINARY_URL` agar koneksi Cloudinary tiket terpisah secara konfigurasi. Bila tidak diisi, aplikasi akan memakai `CLOUDINARY_URL` sebagai fallback. `CLOUDINARY_AUDIO_URL` tidak digunakan.
+Gunakan `CLOUDINARY_URL` utama. `CLOUDINARY_AUDIO_URL` tidak diperlukan untuk sistem tiket.
 
 ### Membuat secret enkripsi
 
@@ -105,3 +105,17 @@ Cloudinary adalah media asset storage, bukan database transaksional. Versi ini c
 - Jangan memasukkan `CLOUDINARY_URL`, API secret, EmailJS private key, atau secret admin ke JavaScript browser.
 - Rotasi seluruh credential yang pernah ditempel di chat, log, repository, atau screenshot.
 - Simpan salinan aman `TICKET_ENCRYPTION_KEY`; kehilangan key berarti kehilangan akses ke isi tiket lama.
+
+
+## Perbaikan email wajib
+
+Cloudinary hanya menyimpan tiket; Cloudinary tidak mengirim email. Agar email terkirim, buat **Email Service** dan **Email Template** di EmailJS, lalu isi Environment Variables Vercel.
+
+Pada template admin EmailJS, atur:
+
+- **To Email:** `{{to_email}}`
+- **Reply-To:** `{{reply_to}}`
+- **Subject:** `{{subject}}`
+- Isi pesan dapat memakai `{{ticket_id}}`, `{{name}}`, `{{email}}`, `{{category}}`, `{{description}}`, dan `{{status_url}}`.
+
+Sesudah deploy, buka `/api/health`. Bagian `email.configured` harus `true`. Login `/admin`, kemudian tekan **Uji pengiriman email**. Tiket yang sebelumnya gagal memiliki tombol **Coba kirim email**.

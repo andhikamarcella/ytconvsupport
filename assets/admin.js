@@ -9,6 +9,7 @@ const loginButton = document.querySelector('#loginButton');
 const loginAlert = document.querySelector('#loginAlert');
 const logoutButton = document.querySelector('#logoutButton');
 const refreshButton = document.querySelector('#refreshTickets');
+const testEmailButton = document.querySelector('#testEmailButton');
 const ticketList = document.querySelector('#ticketList');
 const ticketCount = document.querySelector('#ticketCount');
 const dashboardAlert = document.querySelector('#dashboardAlert');
@@ -36,6 +37,7 @@ function showLogin() {
   dashboardView.hidden = true;
   logoutButton.hidden = true;
   refreshButton.disabled = true;
+  if (testEmailButton) testEmailButton.disabled = true;
 }
 
 function showDashboard() {
@@ -43,6 +45,7 @@ function showDashboard() {
   dashboardView.hidden = false;
   logoutButton.hidden = false;
   refreshButton.disabled = false;
+  if (testEmailButton) testEmailButton.disabled = false;
 }
 
 function statusBadge(ticket) {
@@ -102,6 +105,33 @@ function createTicketCard(ticket) {
   edit.textContent = 'Perbarui';
   edit.addEventListener('click', () => openTicketModal(ticket));
   actions.appendChild(edit);
+
+  const retry = document.createElement('button');
+  retry.className = 'secondary-button';
+  retry.type = 'button';
+  retry.textContent = ticket.emailSent ? 'Kirim ulang email' : 'Coba kirim email';
+  retry.addEventListener('click', async () => {
+    retry.disabled = true;
+    const original = retry.textContent;
+    retry.textContent = 'Mengirim...';
+    try {
+      const response = await fetch('/api/admin/email-retry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ ticketId: ticket.ticketId })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Email tidak dapat dikirim.');
+      toast('Email tiket berhasil dikirim.', 'success');
+      await loadTickets();
+    } catch (error) {
+      showAlert(dashboardAlert, error.message || 'Email tidak dapat dikirim.', 'error');
+    } finally {
+      retry.disabled = false;
+      retry.textContent = original;
+    }
+  });
+  actions.appendChild(retry);
 
   article.append(content, actions);
   return article;
@@ -208,6 +238,27 @@ logoutButton.addEventListener('click', async () => {
 });
 
 refreshButton.addEventListener('click', () => loadTickets());
+
+if (testEmailButton) {
+  testEmailButton.addEventListener('click', async () => {
+    const original = testEmailButton.innerHTML;
+    testEmailButton.disabled = true;
+    testEmailButton.textContent = 'Mengirim email uji...';
+    hideAlert(dashboardAlert);
+    try {
+      const response = await fetch('/api/admin/email-test', { method: 'POST', headers: { Accept: 'application/json' } });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Email uji gagal dikirim.');
+      toast(`Email uji dikirim ke ${data.delivery?.to || 'inbox support'}.`, 'success');
+    } catch (error) {
+      showAlert(dashboardAlert, error.message || 'Email uji gagal dikirim.', 'error');
+    } finally {
+      testEmailButton.disabled = false;
+      testEmailButton.innerHTML = original;
+    }
+  });
+}
+
 statusFilter.addEventListener('change', () => loadTickets(true));
 searchInput.addEventListener('input', () => {
   clearTimeout(searchTimer);

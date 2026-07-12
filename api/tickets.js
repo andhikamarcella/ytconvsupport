@@ -88,6 +88,7 @@ export default async function handler(req, res) {
         statusUrl
       },
       emailSent: ticket.emailSent,
+      emailCode: ticket.emailSent ? '' : (ticket.emailError.includes('belum lengkap') ? 'EMAILJS_NOT_CONFIGURED' : 'EMAIL_DELIVERY_FAILED'),
       message: ticket.emailSent
         ? 'Tiket berhasil dibuat dan dikirim ke tim support.'
         : 'Tiket berhasil dibuat. Pengiriman email sedang bermasalah, tetapi tiket tetap tersimpan.'
