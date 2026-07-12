@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pusat bantuan resmi YTConv untuk membuat dan memeriksa status tiket dukungan.">
+  <meta name="theme-color" content="#ffffff">
+  <title>YTConv Support</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310a37f'/%3E%3Cpath d='M18 20h8l6 10 6-10h8L36 36v10h-8V36L18 20Z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navigasi utama">
+      <a class="sidebar-brand" href="/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 4h4l3 5 3-5h4l-5 8v6h-4v-6L5 4Z"/></svg>
+        </span>
+        <span class="brand-copy">YTConv Support<small>Pusat bantuan</small></span>
+      </a>
+
+      <a class="sidebar-primary" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Buat tiket baru</span>
+      </a>
+
+      <div class="sidebar-section-label">Dukungan</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" data-page="create" href="/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h5"/></svg>
+          <span>Buat tiket</span>
+        </a>
+        <a class="sidebar-link" data-page="status" href="/ticket-status.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span>Cek status tiket</span>
+        </a>
+        <a class="sidebar-link" data-support-email href="mailto:help.ytconv@proton.me">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+          <span class="support-address">help.ytconv@proton.me</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-footer">
+        <a class="sidebar-link" data-main-app href="https://ytconv.onrender.com" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>
+          <span>Kembali ke YTConv</span>
+        </a>
+        <button class="sidebar-link" type="button" data-theme-toggle>
+          <span>Tema</span>
+        </button>
+      </div>
+    </aside>
+    <button class="sidebar-overlay" type="button" aria-label="Tutup menu"></button>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <button class="icon-button mobile-menu" type="button" data-menu-open aria-label="Buka menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <span>YTConv Support</span>
+          <span class="pill">Resmi</span>
+        </div>
+        <div class="topbar-actions">
+          <a class="icon-button" href="/ticket-status.html" aria-label="Cek status tiket">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </a>
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Ganti tema"></button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="hero">
+          <div class="hero-badge"><span class="dot"></span> Layanan dukungan tersedia</div>
+          <h1>Ada yang bisa kami bantu?</h1>
+          <p>Ceritakan kendala yang kamu alami. Tiket akan dikirim langsung ke tim YTConv dan dapat dipantau menggunakan ID tiket.</p>
+        </section>
+
+        <section class="ticket-panel" id="ticketPanel" aria-labelledby="ticketTitle">
+          <div id="formView">
+            <div class="panel-heading">
+              <div>
+                <h2 id="ticketTitle">Buat tiket dukungan</h2>
+                <p>Isi informasi seperlunya agar masalah lebih cepat diperiksa.</p>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div id="formAlert" class="alert error" hidden></div>
+              <form id="ticketForm" novalidate>
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="name">Nama</label>
+                    <input class="input" id="name" name="name" type="text" autocomplete="name" minlength="2" maxlength="80" placeholder="Nama kamu" required>
+                  </div>
+                  <div class="field">
+                    <label for="email">Email</label>
+                    <input class="input" id="email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="nama@email.com" required>
+                  </div>
+                  <div class="field">
+                    <label for="ticketId">ID tiket</label>
+                    <div class="input-wrap">
+                      <input class="input" id="ticketId" name="ticketId" type="text" readonly aria-describedby="ticketHint">
+                      <button class="inline-action" id="regenerateTicket" type="button" aria-label="Buat ID tiket baru" title="Buat ID baru">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>
+                      </button>
+                    </div>
+                    <span class="field-hint" id="ticketHint">Dibuat otomatis dan akan dikonfirmasi oleh server.</span>
+                  </div>
+                  <div class="field">
+                    <label for="category">Kategori</label>
+                    <select class="select" id="category" name="category" required>
+                      <option value="">Pilih kategori</option>
+                      <option value="download">Masalah unduhan</option>
+                      <option value="conversion">Masalah konversi</option>
+                      <option value="account">Akun dan login</option>
+                      <option value="playlist">Playlist</option>
+                      <option value="subtitle">Subtitle</option>
+                      <option value="privacy">Privasi dan keamanan</option>
+                      <option value="suggestion">Saran dan masukan</option>
+                      <option value="other">Lainnya</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="description">Deskripsi masalah</label>
+                    <div class="input-wrap">
+                      <textarea class="textarea" id="description" name="description" minlength="20" maxlength="3000" placeholder="Jelaskan apa yang terjadi, pesan error yang muncul, dan langkah yang sudah dicoba..." required></textarea>
+                      <span class="char-counter"><span id="descriptionCount">0</span>/3000</span>
+                    </div>
+                    <span class="field-hint">Jangan tulis password, cookie, API key, atau data rahasia lainnya.</span>
+                  </div>
+                  <div class="field full" id="turnstileField" hidden>
+                    <label>Verifikasi keamanan</label>
+                    <div id="turnstileContainer"></div>
+                  </div>
+                </div>
+
+                <div class="form-footer">
+                  <p class="form-note">Dengan mengirim tiket, kamu mengizinkan informasi di atas digunakan untuk menangani laporan ini.</p>
+                  <button class="primary-button" id="submitButton" type="submit">
+                    <span>Kirim tiket</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="m5 12 14-7-5 14-2-6-7-1Z"/><path d="m12 13 7-8"/></svg>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="success-view" id="successView" hidden>
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>
+            </div>
+            <h2>Tiket berhasil dibuat</h2>
+            <p id="successMessage">Laporan sudah diterima oleh tim support. Simpan ID berikut untuk memeriksa perkembangannya.</p>
+            <div class="ticket-code">
+              <div><span>ID tiket</span><strong id="createdTicketId">-</strong></div>
+              <button class="icon-button" id="copyTicketId" type="button" aria-label="Salin ID tiket">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+              </button>
+            </div>
+            <div class="success-actions">
+              <a class="primary-button" id="statusLink" href="/ticket-status.html">Cek status tiket</a>
+              <button class="secondary-button" id="newTicketButton" type="button">Buat tiket lain</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="quickTitle">
+          <h2 class="section-title" id="quickTitle">Pilihan bantuan lain</h2>
+          <div class="quick-links">
+            <a class="quick-card" href="/ticket-status.html">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <strong>Cek status tiket</strong>
+              <span>Lihat perkembangan laporan menggunakan ID tiket.</span>
+            </a>
+            <a class="quick-card" data-support-email href="mailto:help.ytconv@proton.me">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+              <strong>Kirim email</strong>
+              <span>Hubungi help.ytconv@proton.me secara langsung.</span>
+            </a>
+            <a class="quick-card" data-main-app href="https://ytconv.onrender.com" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>
+              <strong>Buka YTConv</strong>
+              <span>Kembali ke layanan utama YTConv.</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="faqTitle">
+          <h2 class="section-title" id="faqTitle">Pertanyaan umum</h2>
+          <div class="faq-list">
+            <details>
+              <summary>Berapa lama tiket diperiksa?</summary>
+              <p>Waktu penanganan bergantung pada jenis masalah dan antrean. Gunakan halaman status untuk melihat pembaruan terbaru dari tim support.</p>
+            </details>
+            <details>
+              <summary>Apakah ID tiket harus disimpan?</summary>
+              <p>Ya. ID tiket adalah cara utama untuk membuka halaman status. Jangan membagikannya di tempat publik.</p>
+            </details>
+            <details>
+              <summary>Data apa yang tidak boleh dikirim?</summary>
+              <p>Jangan pernah mengirim password, token login, cookies.txt, API key, private key, nomor kartu, atau informasi rahasia lain melalui formulir.</p>
+            </details>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>

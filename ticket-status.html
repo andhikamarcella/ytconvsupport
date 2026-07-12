@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Periksa perkembangan tiket dukungan YTConv menggunakan ID tiket.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Cek Status Tiket — YTConv Support</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310a37f'/%3E%3Cpath d='M18 20h8l6 10 6-10h8L36 36v10h-8V36L18 20Z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navigasi utama">
+      <a class="sidebar-brand" href="/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 4h4l3 5 3-5h4l-5 8v6h-4v-6L5 4Z"/></svg>
+        </span>
+        <span class="brand-copy">YTConv Support<small>Pusat bantuan</small></span>
+      </a>
+      <a class="sidebar-primary" href="/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Buat tiket baru</span>
+      </a>
+      <div class="sidebar-section-label">Dukungan</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link" data-page="create" href="/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v12H8l-4 4V5Z"/><path d="M8 9h8M8 13h5"/></svg>
+          <span>Buat tiket</span>
+        </a>
+        <a class="sidebar-link" data-page="status" href="/ticket-status.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span>Cek status tiket</span>
+        </a>
+        <a class="sidebar-link" data-support-email href="mailto:help.ytconv@proton.me">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+          <span class="support-address">help.ytconv@proton.me</span>
+        </a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-footer">
+        <a class="sidebar-link" data-main-app href="https://ytconv.onrender.com" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>
+          <span>Kembali ke YTConv</span>
+        </a>
+        <button class="sidebar-link" type="button" data-theme-toggle><span>Tema</span></button>
+      </div>
+    </aside>
+    <button class="sidebar-overlay" type="button" aria-label="Tutup menu"></button>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <button class="icon-button mobile-menu" type="button" data-menu-open aria-label="Buka menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <span>Status tiket</span>
+          <span class="pill">YTConv Support</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Ganti tema"></button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="hero">
+          <div class="hero-badge"><span class="dot"></span> Pelacakan tiket</div>
+          <h1>Cek perkembangan tiket</h1>
+          <p>Masukkan ID yang diterima setelah membuat laporan. Contoh: TKT-TYIZZL7SUODB.</p>
+        </section>
+
+        <section class="ticket-panel" aria-labelledby="statusTitle">
+          <div class="panel-heading">
+            <div>
+              <h2 id="statusTitle">Cari tiket</h2>
+              <p>Status yang tampil adalah pembaruan terbaru dari tim support.</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="statusAlert" class="alert error" hidden></div>
+            <form class="status-search" id="statusForm" novalidate>
+              <label class="sr-only" for="statusTicketId">ID tiket</label>
+              <input class="input" id="statusTicketId" type="text" maxlength="21" autocomplete="off" spellcheck="false" placeholder="TKT-XXXXXXXXXXXX" required>
+              <button class="primary-button" id="statusButton" type="submit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <span>Cari tiket</span>
+              </button>
+            </form>
+            <div id="statusResult" hidden></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="alert info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            <div>Untuk menjaga privasi, halaman ini tidak menampilkan nama, alamat email, maupun isi lengkap laporan.</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="/assets/status.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#ffffff">
+  <title>Admin Tiket — YTConv Support</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310a37f'/%3E%3Cpath d='M18 20h8l6 10 6-10h8L36 36v10h-8V36L18 20Z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navigasi admin">
+      <a class="sidebar-brand" href="/admin">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 4h4l3 5 3-5h4l-5 8v6h-4v-6L5 4Z"/></svg>
+        </span>
+        <span class="brand-copy">YTConv Support<small>Panel admin</small></span>
+      </a>
+      <button class="sidebar-primary" id="refreshTickets" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>
+        <span>Muat ulang tiket</span>
+      </button>
+      <div class="sidebar-section-label">Navigasi</div>
+      <nav class="sidebar-nav">
+        <a class="sidebar-link active" href="/admin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+          <span>Semua tiket</span>
+        </a>
+        <a class="sidebar-link" href="/" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/></svg>
+          <span>Lihat situs support</span>
+        </a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-footer">
+        <button class="sidebar-link" id="logoutButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/></svg>
+          <span>Keluar</span>
+        </button>
+        <button class="sidebar-link" type="button" data-theme-toggle><span>Tema</span></button>
+      </div>
+    </aside>
+    <button class="sidebar-overlay" type="button" aria-label="Tutup menu"></button>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <button class="icon-button mobile-menu" type="button" data-menu-open aria-label="Buka menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          </button>
+          <span>Panel tiket</span>
+          <span class="pill">Admin</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button" type="button" data-theme-toggle aria-label="Ganti tema"></button>
+        </div>
+      </header>
+
+      <div class="content admin-content">
+        <section class="login-wrap" id="loginView" hidden>
+          <div class="login-card">
+            <h1>Masuk ke panel</h1>
+            <p>Gunakan akun admin YTConv Support.</p>
+            <div id="loginAlert" class="alert error" hidden></div>
+            <form id="loginForm" novalidate>
+              <div class="field">
+                <label for="username">Username</label>
+                <input class="input" id="username" name="username" type="text" autocomplete="username" required>
+              </div>
+              <div class="field">
+                <label for="password">Password</label>
+                <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+              </div>
+              <button class="primary-button" id="loginButton" type="submit">Masuk</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="dashboardView" hidden>
+          <div class="admin-toolbar">
+            <div>
+              <h1>Daftar tiket</h1>
+              <p class="field-hint"><span id="ticketCount">0</span> tiket ditemukan</p>
+            </div>
+            <div class="admin-filters">
+              <input class="input" id="ticketSearch" type="search" placeholder="Cari ID, nama, atau email...">
+              <select class="select" id="statusFilter" aria-label="Filter status">
+                <option value="">Semua status</option>
+                <option value="open">Tiket diterima</option>
+                <option value="in_review">Sedang diperiksa</option>
+                <option value="waiting_user">Menunggu balasan</option>
+                <option value="resolved">Selesai</option>
+                <option value="closed">Ditutup</option>
+              </select>
+            </div>
+          </div>
+          <div id="dashboardAlert" class="alert error" hidden></div>
+          <div class="ticket-list" id="ticketList"></div>
+          <div class="pagination" id="pagination" hidden>
+            <button class="secondary-button" id="previousPage" type="button">Sebelumnya</button>
+            <span class="field-hint" id="pageInfo">Halaman 1</span>
+            <button class="secondary-button" id="nextPage" type="button">Berikutnya</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="ticketModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h2 id="modalTitle">Perbarui tiket</h2>
+        <button class="icon-button" id="closeModal" type="button" aria-label="Tutup">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="updateForm">
+        <div class="modal-body">
+          <div id="modalAlert" class="alert error" hidden></div>
+          <div class="field">
+            <label>ID tiket</label>
+            <input class="input" id="modalTicketId" type="text" readonly>
+          </div>
+          <div class="field">
+            <label for="modalStatus">Status</label>
+            <select class="select" id="modalStatus" required>
+              <option value="open">Tiket diterima</option>
+              <option value="in_review">Sedang diperiksa</option>
+              <option value="waiting_user">Menunggu balasan pengguna</option>
+              <option value="resolved">Selesai</option>
+              <option value="closed">Ditutup</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="modalNote">Catatan yang terlihat pengguna</label>
+            <textarea class="textarea" id="modalNote" maxlength="1000" placeholder="Contoh: Kami sedang memeriksa kendala pada proses konversi..."></textarea>
+            <span class="field-hint">Catatan ini tampil di halaman status tiket.</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="secondary-button" id="cancelModal" type="button">Batal</button>
+          <button class="primary-button" id="saveTicket" type="submit">Simpan perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="/assets/admin.js"></script>
+</body>
+</html>
