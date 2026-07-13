@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YTConv Support System Ultimate</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header card glass">
+        <div>
+          <h1>YTConv Support System Ultimate</h1>
+          <p class="meta">Mini helpdesk inside Chrome</p>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggle" class="btn btn-secondary" type="button">Neon</button>
+          <button id="lockButton" class="btn btn-secondary" type="button">Lock</button>
+        </div>
+      </header>
+
+      <nav class="tabs card glass" role="tablist">
+        <button class="tab is-active" data-tab="tickets" role="tab" aria-selected="true">Tickets</button>
+        <button class="tab" data-tab="analytics" role="tab" aria-selected="false">Analytics</button>
+        <button class="tab" data-tab="templates" role="tab" aria-selected="false">Templates</button>
+        <button class="tab" data-tab="settings" role="tab" aria-selected="false">Settings</button>
+      </nav>
+
+      <section class="content">
+        <article id="tickets" class="panel is-active" role="tabpanel">
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Create Ticket from Email</h2>
+              <small>Parser + workflow</small>
+            </div>
+
+            <div class="grid two">
+              <label>
+                Ticket Type
+                <select id="ticketType">
+                  <option>General</option>
+                  <option>Bug</option>
+                  <option>Billing</option>
+                  <option>Account</option>
+                  <option>Technical</option>
+                </select>
+              </label>
+
+              <label>
+                Filter Status
+                <select id="statusFilter">
+                  <option>All</option>
+                  <option>Open</option>
+                  <option>Investigating</option>
+                  <option>Waiting User</option>
+                  <option>Resolved</option>
+                  <option>Closed</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Complaint Email Content
+              <textarea id="rawEmail" rows="8" placeholder="From: Jane Doe <jane@company.com>&#10;Subject: Cannot login&#10;&#10;Hi support, I cannot login and payment failed today..."></textarea>
+            </label>
+            <button id="createTicketBtn" class="btn btn-primary btn-block" type="button">Generate Ticket</button>
+            <p id="statusText" class="status"></p>
+          </section>
+
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Ticket Queue</h2>
+              <small id="ticketCount">0 tickets</small>
+            </div>
+            <div id="ticketList" class="ticket-list empty">No tickets yet.</div>
+          </section>
+        </article>
+
+        <article id="analytics" class="panel" role="tabpanel" hidden>
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Analytics Dashboard</h2>
+              <small>Realtime snapshot</small>
+            </div>
+            <div class="stats-grid">
+              <div class="stat"><strong id="statToday">0</strong><span>Total Today</span></div>
+              <div class="stat"><strong id="statHigh">0</strong><span>High Priority</span></div>
+              <div class="stat"><strong id="statResolvedRate">0%</strong><span>Resolved Rate</span></div>
+              <div class="stat"><strong id="statOpenClosed">0:0</strong><span>Open : Closed</span></div>
+            </div>
+
+            <div class="chart-block">
+              <p>Status Distribution</p>
+              <div id="statusBars" class="bars"></div>
+            </div>
+          </section>
+        </article>
+
+        <article id="templates" class="panel" role="tabpanel" hidden>
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Auto Reply Generator</h2>
+              <small>Tone-based response</small>
+            </div>
+
+            <div class="grid two">
+              <label>
+                Select Ticket
+                <select id="replyTicketSelect"></select>
+              </label>
+              <label>
+                Tone
+                <select id="replyTone">
+                  <option>Professional</option>
+                  <option>Friendly</option>
+                  <option>Short</option>
+                  <option>Detailed</option>
+                  <option>Technical</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row">
+              <button id="generateReplyBtn" class="btn btn-primary" type="button">Regenerate Reply</button>
+              <button id="copySubjectBtn" class="btn btn-secondary" type="button">Copy Subject</button>
+              <button id="copyReplyBtn" class="btn btn-secondary" type="button">Copy Full Reply</button>
+            </div>
+
+            <label>
+              Reply Preview
+              <textarea id="replyPreview" rows="10" placeholder="Generated reply appears here..."></textarea>
+            </label>
+          </section>
+        </article>
+
+        <article id="settings" class="panel" role="tabpanel" hidden>
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Telegram</h2>
+              <small>Optional notifications</small>
+            </div>
+
+            <label class="inline">
+              <input id="telegramEnabled" type="checkbox" />
+              <span>Enable Telegram notifications</span>
+            </label>
+            <label>Bot Token <input id="telegramBot" type="password" placeholder="123456:ABC..." /></label>
+            <label>Chat ID <input id="telegramChat" type="text" placeholder="-1001234567890" /></label>
+            <button id="saveTelegramBtn" class="btn btn-secondary" type="button">Save Telegram Settings</button>
+          </section>
+
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Backups & Export</h2>
+              <small>CSV and JSON tools</small>
+            </div>
+
+            <div class="grid two">
+              <button id="exportCsvBtn" class="btn btn-secondary" type="button">Export CSV (Filtered)</button>
+              <button id="exportJsonBtn" class="btn btn-secondary" type="button">Export JSON Backup</button>
+            </div>
+
+            <label>
+              Import JSON Backup
+              <textarea id="jsonImportInput" rows="6" placeholder='Paste JSON array here...'></textarea>
+            </label>
+            <button id="importJsonBtn" class="btn btn-secondary" type="button">Import JSON</button>
+          </section>
+
+          <section class="card glass">
+            <div class="section-head">
+              <h2>Admin Lock Mode</h2>
+              <small>4-digit PIN + auto lock</small>
+            </div>
+            <label>Set / Update PIN <input id="pinInput" maxlength="4" inputmode="numeric" placeholder="1234" /></label>
+            <button id="savePinBtn" class="btn btn-secondary" type="button">Save PIN</button>
+          </section>
+        </article>
+      </section>
+
+      <footer class="footer card glass"><small>v3.0.0 · YTConv Ultimate</small></footer>
+    </main>
+
+    <section id="lockOverlay" class="lock-overlay hidden">
+      <div class="lock-card card glass">
+        <h2>Extension Locked</h2>
+        <p>Enter 4-digit admin PIN to continue.</p>
+        <input id="unlockPin" maxlength="4" inputmode="numeric" placeholder="••••" />
+        <button id="unlockBtn" class="btn btn-primary btn-block" type="button">Unlock</button>
+        <p id="lockMessage" class="status"></p>
+      </div>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
